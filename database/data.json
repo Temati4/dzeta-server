@@ -1,0 +1,57 @@
+{
+  "users": [
+    {
+      "uid": 1,
+      "id": "user_aaa16a827ae67db9",
+      "email": "homewexile@gmail.com",
+      "username": "WexileDzeta",
+      "password": "$2a$10$S9x30Vwah2OlD.AAAIB5NuGtRtGRfSdw2bvXTmGCkCWnqDmSL152K",
+      "createdAt": "2026-01-18T15:55:21.654Z",
+      "subscriptionId": null,
+      "subscriptionStatus": "inactive",
+      "subscriptionExpiresAt": null,
+      "role": "user"
+    }
+  ],
+  "subscriptions": [],
+  "payments": [],
+  "sessions": [],
+  "products": [
+    {
+      "id": "preorder",
+      "nameEn": "Preorder",
+      "nameRu": "Предзаказ",
+      "descriptionEn": "Preorder access",
+      "descriptionRu": "Доступ к Предзаказу",
+      "price": 400,
+      "durationDays": "Lifetime"
+    },
+    {
+      "id": "beta",
+      "nameEn": "Beta Access",
+      "nameRu": "Бета доступ",
+      "descriptionEn": "Full access to Beta version",
+      "descriptionRu": "Полный доступ к Бета версии",
+      "price": 600,
+      "durationDays": "Lifetime"
+    }
+  ],
+  "promoCodes": [
+    {
+      "id": "promo_1705623412345",
+      "code": "WEXILEDZETA",
+      "discountPercent": 100,
+      "discountFixed": null,
+      "maxUses": 1,
+      "usesCount": 1,
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "isActive": true,
+      "appliedTo": [
+        "preorder",
+        "beta"
+      ],
+      "createdAt": "2026-01-18T16:00:00Z"
+    }
+  ],
+  "userCounter": 1
+}
