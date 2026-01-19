@@ -2,11 +2,11 @@
   "users": [
     {
       "uid": 1,
-      "id": "user_aaa16a827ae67db9",
+      "id": "user_83dea2fecf390794",
       "email": "homewexile@gmail.com",
       "username": "WexileDzeta",
-      "password": "$2a$10$S9x30Vwah2OlD.AAAIB5NuGtRtGRfSdw2bvXTmGCkCWnqDmSL152K",
-      "createdAt": "2026-01-18T15:55:21.654Z",
+      "password": "$2a$10$UfgBNQUVPfitLysBrdrCG.Mk4z2OX88XkszHd2fgvkJcBu2ZO9AHS",
+      "createdAt": "2026-01-19T19:18:31.325Z",
       "subscriptionId": null,
       "subscriptionStatus": "inactive",
       "subscriptionExpiresAt": null,
@@ -53,5 +53,5 @@
       "createdAt": "2026-01-18T16:00:00Z"
     }
   ],
-  "userCounter": 1
+  "userCounter": 3
 }

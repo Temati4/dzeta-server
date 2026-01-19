@@ -17,6 +17,16 @@ router.get('/profile', authMiddleware, (req, res) => {
       });
     }
 
+    // Check if user is banned
+    if (user.banned) {
+      console.log('[USER] User is banned:', req.userId);
+      return res.status(403).json({ 
+        error: 'Account banned',
+        code: 'ACCOUNT_BANNED',
+        details: 'This account has been banned'
+      });
+    }
+
     let subscription = null;
     if (user.subscriptionId) {
       subscription = global.db.getSubscription(user.subscriptionId);
@@ -30,7 +40,16 @@ router.get('/profile', authMiddleware, (req, res) => {
         id: user.id,
         email: user.email,
         username: user.username,
-        subscription
+        role: user.role || 'user',
+        banned: user.banned || false,
+        subscription: subscription ? {
+          id: subscription.id,
+          planType: subscription.planType,
+          status: subscription.status || 'active',
+          startedAt: subscription.startedAt,
+          expiresAt: subscription.expiresAt,
+          isActive: new Date() < new Date(subscription.expiresAt)
+        } : null
       }
     });
   } catch (error) {

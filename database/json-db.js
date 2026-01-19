@@ -146,6 +146,19 @@ class JsonDatabase {
     return subscriptions[subscriptions.length - 1] || null;
   }
 
+  updateSubscription(subscriptionId, updates) {
+    const subIndex = this.data.subscriptions.findIndex(s => s.id === subscriptionId);
+    if (subIndex === -1) return null;
+    
+    Object.assign(this.data.subscriptions[subIndex], updates);
+    this.saveData();
+    return this.data.subscriptions[subIndex];
+  }
+
+  getSubscriptionByUserId(userId) {
+    return this.getUserSubscription(userId);
+  }
+
   // Payment operations
   createPayment(userId, amount, currency = 'RUB', status = 'pending') {
     const paymentId = 'pay_' + crypto.randomBytes(8).toString('hex');
@@ -171,6 +184,10 @@ class JsonDatabase {
     this.data.payments[paymentIndex].status = status;
     this.saveData();
     return this.data.payments[paymentIndex];
+  }
+
+  getPaymentById(paymentId) {
+    return this.data.payments.find(p => p.id === paymentId) || null;
   }
 
   // Session operations
@@ -242,13 +259,13 @@ class JsonDatabase {
       this.data.products = [];
     }
     const product = {
-      id: productData.id,
-      nameEn: productData.nameEn,
-      nameRu: productData.nameRu,
-      descriptionEn: productData.descriptionEn,
-      descriptionRu: productData.descriptionRu,
+      id: productData.id || ('prod_' + Date.now()),
+      key: productData.key,
+      name: productData.name,
+      description: productData.description,
       price: productData.price,
-      durationDays: productData.durationDays
+      features: productData.features || [],
+      active: productData.active !== undefined ? productData.active : true
     };
     this.data.products.push(product);
     this.saveData();
@@ -274,6 +291,16 @@ class JsonDatabase {
       throw new Error('Product not found');
     }
     const deleted = this.data.products.splice(index, 1);
+    this.saveData();
+    return deleted[0];
+  }
+
+  deleteUser(userId) {
+    const userIndex = this.data.users.findIndex(u => u.id === userId);
+    if (userIndex === -1) {
+      throw new Error('User not found');
+    }
+    const deleted = this.data.users.splice(userIndex, 1);
     this.saveData();
     return deleted[0];
   }
@@ -367,6 +394,91 @@ class JsonDatabase {
     promoCode.usesCount = (promoCode.usesCount || 0) + 1;
     this.saveData();
     return promoCode;
+  }
+  
+  // Admin-specific methods
+  getAllUsers() {
+    return this.data.users.map(u => {
+      const { password, ...userWithoutPassword } = u;
+      return userWithoutPassword;
+    });
+  }
+
+  getUserById(id) {
+    const user = this.data.users.find(u => u.id === id);
+    if (!user) return null;
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
+  updateUser(id, updates) {
+    const userIndex = this.data.users.findIndex(u => u.id === id);
+    if (userIndex === -1) return null;
+
+    Object.assign(this.data.users[userIndex], updates);
+    this.saveData();
+
+    const { password, ...userWithoutPassword } = this.data.users[userIndex];
+    return userWithoutPassword;
+  }
+
+  deleteUser(id) {
+    const userIndex = this.data.users.findIndex(u => u.id === id);
+    if (userIndex === -1) return null;
+    
+    const deleted = this.data.users.splice(userIndex, 1)[0];
+    this.saveData();
+    return deleted;
+  }
+
+  // Product operations
+  getProducts() {
+    return this.data.products || [];
+  }
+
+  getProductById(id) {
+    return (this.data.products || []).find(p => p.id === id);
+  }
+
+  createProduct(productData) {
+    if (!this.data.products) {
+      this.data.products = [];
+    }
+    const product = {
+      id: productData.id || ('prod_' + Date.now()),
+      key: productData.key,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      features: productData.features || [],
+      active: productData.active !== undefined ? productData.active : true
+    };
+    this.data.products.push(product);
+    this.saveData();
+    return product;
+  }
+
+  updateProduct(id, productData) {
+    const index = (this.data.products || []).findIndex(p => p.id === id);
+    if (index === -1) {
+      throw new Error('Product not found');
+    }
+    this.data.products[index] = {
+      ...this.data.products[index],
+      ...productData
+    };
+    this.saveData();
+    return this.data.products[index];
+  }
+
+  deleteProduct(id) {
+    const index = (this.data.products || []).findIndex(p => p.id === id);
+    if (index === -1) {
+      throw new Error('Product not found');
+    }
+    const deleted = this.data.products.splice(index, 1);
+    this.saveData();
+    return deleted[0];
   }
 }
 

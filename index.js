@@ -10,25 +10,15 @@ const subscriptionRoutes = require('./routes/subscription');
 const paymentRoutes = require('./routes/payment');
 const productsRoutes = require('./routes/products');
 const promoRoutes = require('./routes/promo');
+// const adminRoutes = require('./routes/admin'); // Admin routes temporarily disabled
 
 // Database initialization
 let db;
 const dbType = process.env.DATABASE_TYPE || 'json';
 
-if (dbType === 'postgres') {
-  const { PostgresDatabase, initializeDatabase } = require('./database/postgres');
-  db = new PostgresDatabase();
-  
-  // Initialize database tables
-  initializeDatabase().catch(err => {
-    console.error('Failed to initialize database:', err);
-    process.exit(1);
-  });
-} else {
-  // Use JSON database by default
-  const JsonDatabase = require('./database/json-db');
-  db = new JsonDatabase();
-}
+// Use JSON database by default
+const JsonDatabase = require('./database/json-db');
+db = new JsonDatabase();
 
 // Make database available globally
 global.db = db;
@@ -43,7 +33,7 @@ const morganFormat = '[:date[clf]] :method :url :status :response-time ms - :res
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5000',
   credentials: true
 }));
 app.use(morgan(morganFormat));
@@ -66,6 +56,7 @@ app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/promo', promoRoutes);
+// app.use('/api/admin', adminRoutes); // Admin routes temporarily disabled
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -83,25 +74,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use((req, res) => {
-  console.log(`⚠️ 404 Not Found: ${req.method} ${req.path}`);
-  res.status(404).json({ 
-    error: 'Not Found',
-    code: 'NOT_FOUND',
-    message: `${req.method} ${req.path} endpoint does not exist`
-  });
-});
-
+// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`Backend has been started`);
-  console.log(`Running on: http://localhost:${PORT}`);
-  console.log(`API: http://localhost:${PORT}/api`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`CORS Origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
-  console.log(`💾 Database type: ${dbType}`);
-  console.log(`🔒 JWT Secret set: ${!!process.env.JWT_SECRET}`);
+  console.log(`\n🚀 Server running on port ${PORT}`);
+  console.log(`🌍 http://localhost:${PORT}`);
+  console.log(`📁 Database: JSON`);
+  console.log(`🔑 Auth: Enabled\n`);
 });
 
 module.exports = app;

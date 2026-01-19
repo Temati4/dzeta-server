@@ -148,6 +148,16 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    // Check if user is banned
+    if (user.banned) {
+      console.log('[AUTH] Login failed: User is banned:', email);
+      return res.status(403).json({ 
+        error: 'Account banned',
+        code: 'ACCOUNT_BANNED',
+        details: 'This account has been banned and cannot log in'
+      });
+    }
+
     const passwordMatch = comparePasswords(password, user.password);
     
     if (!passwordMatch) {

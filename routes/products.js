@@ -24,7 +24,7 @@ router.get('/:id', (req, res) => {
   }
 });
 
-// Create product (admin only - you can add auth later)
+// Create product (admin only)
 router.post('/', (req, res) => {
   try {
     const product = global.db.createProduct(req.body);

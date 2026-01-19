@@ -171,6 +171,111 @@ class MockDatabase {
   deleteSession(sessionId) {
     return this.sessions.delete(sessionId);
   }
+
+  // Admin-specific methods
+  getAllUsers() {
+    const usersArray = Array.from(this.users.values());
+    return usersArray.map(u => {
+      const { password, ...userWithoutPassword } = u;
+      return userWithoutPassword;
+    });
+  }
+
+  deleteUser(id) {
+    for (const [email, user] of this.users.entries()) {
+      if (user.id === id) {
+        this.users.delete(email);
+        return user;
+      }
+    }
+    return null;
+  }
+
+  // Product operations
+  getProducts() {
+    // Return some default products if not defined
+    if (!this.products) {
+      this.products = [
+        {
+          id: 'preorder',
+          key: 'preorder',
+          name: 'Pre-order Access',
+          description: 'Early access to the platform',
+          price: 299,
+          features: ['Full platform access', 'Early updates', 'Priority support'],
+          active: true
+        },
+        {
+          id: 'beta',
+          key: 'beta',
+          name: 'Beta Access',
+          description: 'Access to beta features',
+          price: 499,
+          features: ['All preorder features', 'Beta features', 'Beta support', 'Feedback channels'],
+          active: true
+        }
+      ];
+    }
+    return this.products;
+  }
+
+  getProductById(id) {
+    const products = this.getProducts();
+    return products.find(p => p.id === id);
+  }
+
+  createProduct(productData) {
+    if (!this.products) {
+      this.products = [];
+    }
+    const product = {
+      id: productData.id || ('prod_' + Date.now()),
+      key: productData.key,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      features: productData.features || [],
+      active: productData.active !== undefined ? productData.active : true
+    };
+    this.products.push(product);
+    return product;
+  }
+
+  updateProduct(id, productData) {
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) {
+      throw new Error('Product not found');
+    }
+    this.products[index] = {
+      ...this.products[index],
+      ...productData
+    };
+    return this.products[index];
+  }
+
+  deleteProduct(id) {
+    const index = this.products.findIndex(p => p.id === id);
+    if (index === -1) {
+      throw new Error('Product not found');
+    }
+    const deleted = this.products.splice(index, 1);
+    return deleted[0];
+  }
+
+  // Promo code operations
+  incrementPromoUsage(codeId) {
+    if (!this.promoCodes) {
+      this.promoCodes = [];
+    }
+    const promoCode = this.promoCodes.find(p => p.id === codeId);
+    
+    if (!promoCode) {
+      return null;
+    }
+    
+    promoCode.usesCount = (promoCode.usesCount || 0) + 1;
+    return promoCode;
+  }
 }
 
 const db = new MockDatabase();
