@@ -8,6 +8,7 @@ const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
+    console.error('[AUTH] No token provided in Authorization header');
     return res.status(401).json({ error: 'No token provided' });
   }
 
@@ -15,18 +16,22 @@ const authMiddleware = (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.id;
     req.user = decoded;
+    console.log('[AUTH] Token verified successfully for user:', decoded.id);
     next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
+    console.error('[AUTH] Token verification failed:', err.message, 'JWT_SECRET matches:', JWT_SECRET === process.env.JWT_SECRET);
+    return res.status(401).json({ error: 'Invalid token', details: err.message });
   }
 };
 
 const generateToken = (userId, email) => {
-  return jwt.sign(
+  const token = jwt.sign(
     { id: userId, email },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRY }
   );
+  console.log('[AUTH] Token generated for user:', userId, '| Secret length:', JWT_SECRET.length);
+  return token;
 };
 
 const hashPassword = (password) => {
